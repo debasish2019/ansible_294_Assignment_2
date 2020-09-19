@@ -1,0 +1,6 @@
+web_pkg: httpd
+firewall_pkg: firewalld
+firewall_service: firewalld
+web_service: httpd
+rule: http
+module: python3-firewall
