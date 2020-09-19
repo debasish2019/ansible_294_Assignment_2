@@ -1,0 +1,49 @@
+---
+- name: Install,Start,Enable Apache server
+  hosts: aws
+  vars_files:
+    - ec2_vars
+  tasks:
+    - name: Installing {{ web_pkg }} service and {{ firewall_pkg }} service
+      yum:
+        name:
+          - "{{ web_pkg }}"
+          - "{{ firewall_pkg }}"
+          - "{{ module }}"
+        state: latest
+    - name: Starting {{ web_pkg }} service
+      service:
+        name: "{{ web_service }}"
+        state: started  
+        enabled: yes
+    - name: Starting {{ firewall_pkg }} service
+      service:
+        name: "{{ firewall_service }}"
+        state: started
+        enabled: yes
+
+    - name: The firewall port for {{ rule }} is open
+      firewalld:
+        service: "{{ rule }}"
+        permanent: true
+        immediate: true
+        state: enabled
+    - name: Push a custom motd file to show the login message
+      copy:
+        src: /home/devloper/ansible_assignment_2/motd
+        dest: /etc/motd
+        mode: 0777
+
+- name: Ensure the webserver is reachable
+  hosts: localhost
+  become: false
+  tasks:
+    - name: Ensure the webserver 13.233.214.215 is reachable
+      uri:
+        url: http://13.233.214.215
+        status_code: 200
+    - name: Ensure the webserver 13.233.235.146 is reachable
+      uri:
+        url: http://13.232.235.146
+        status_code: 200
+
